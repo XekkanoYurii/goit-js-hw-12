@@ -3,9 +3,8 @@ import renderImages from './render-functions.js';
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-
-function searchImages(query) {
-    let loader = document.querySelector('#loader');
+async function searchImages(query) {
+    const loader = document.querySelector('#loader');
     loader.style.display = 'block';
 
     const searchParams = new URLSearchParams({
@@ -18,24 +17,29 @@ function searchImages(query) {
 
     const url = `https://pixabay.com/api/?${searchParams}`;
 
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.hits.length === 0) {
-                iziToast.error({
-                    message: 'Sorry, there are no images matching your search query. Please try again!',
-                    color: '#ff0000',
-                    position: 'topRight',
-                });
-            } else {
-                renderImages(data.hits);
-            }
-            loader.style.display = 'none';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            loader.style.display = 'none';
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+
+        if (data.hits.length === 0) {
+            iziToast.error({
+                message: 'Sorry, there are no images matching your search query. Please try again!',
+                color: '#ff0000',
+                position: 'topRight',
+            });
+        } else {
+            renderImages(data.hits);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        iziToast.error({
+            message: 'Something went wrong. Please try again later.',
+            color: '#ff0000',
+            position: 'topRight',
         });
+    } finally {
+        loader.style.display = 'none';
+    }
 }
 
 export default searchImages;

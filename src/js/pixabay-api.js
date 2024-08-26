@@ -3,21 +3,34 @@ import renderImages from './render-functions.js';
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-async function searchImages(query) {
-    const loader = document.querySelector('#loader');
-    loader.style.display = 'block';
+export default searchImages;
+
+let page = 80;
+let query = '';
+
+async function searchImages(newQuery) {
+    if (newQuery !== query) {
+        query = newQuery;
+        page = 1;
+    }
+
+    let countForPage = 15;
 
     const searchParams = new URLSearchParams({
         key: "45503418-8e4034a5d9b1169325787ad22",
         q: query,
         image_type: "photo",
         orientation: "horizontal",
-        safesearch: true
+        safesearch: true,
+        per_page: countForPage,
+        page: page
     });
 
     const url = `https://pixabay.com/api/?${searchParams}`;
 
     try {
+        document.querySelector('span').style.display = 'block';
+
         const response = await axios.get(url);
         const data = response.data;
 
@@ -30,16 +43,32 @@ async function searchImages(query) {
         } else {
             renderImages(data.hits);
         }
+
+        if (countForPage * page >= data.totalHits) {
+            document.querySelector('#load-more-button').style.display = 'none';
+            iziToast.info({
+                message: "We're sorry, but you've reached the end of search results.",
+                position: 'topRight',
+            });
+        } else {
+            document.querySelector('#load-more-button').style.display = 'block';
+        }
+
+        const cardHeight = document.querySelector('img').getBoundingClientRect().height;
+        window.scrollBy({
+            top: cardHeight * 2,
+            behavior: 'smooth'
+        });
+
+        page++;
     } catch (error) {
         console.error('Error:', error);
-        iziToast.error({
-            message: 'Something went wrong. Please try again later.',
-            color: '#ff0000',
-            position: 'topRight',
-        });
-    } finally {
-        loader.style.display = 'none';
     }
+    document.querySelector('span').style.display = 'none';
 }
 
-export default searchImages;
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelector('#load-more-button').addEventListener('click', () => {
+        searchImages(query);
+    });
+});

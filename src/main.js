@@ -3,8 +3,9 @@ import searchImages from './js/pixabay-api.js';
 
 document.getElementById('form').addEventListener('submit', function(event) {
     event.preventDefault(); 
-    let inputValue = event.target.elements.input.value; 
+    var inputValue = event.target.elements.input.value; 
     document.getElementById('main-ul').innerHTML = '';
+    document.getElementById('load-more-button').style.display = 'none';
 
 
     if (inputValue.trim() === '') {

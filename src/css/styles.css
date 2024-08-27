@@ -52,7 +52,9 @@ body {
 #input:hover {
   border: 1px solid #000;
 }
-
+#load-more-button {
+  display: none;
+}
 button {
   width: 91px;
   height: 40px;

@@ -5,7 +5,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 export default searchImages;
 
-let page = 1;
+let page = 1; 
 let query = '';
 
 async function searchImages(newQuery) {
@@ -27,9 +27,8 @@ async function searchImages(newQuery) {
     });
 
     const url = `https://pixabay.com/api/?${searchParams}`;
-
     try {
-        document.querySelector('span.loader').style.display = 'block';
+        document.querySelector('span').style.display = 'block';
 
         const response = await axios.get(url);
         const data = response.data;
@@ -42,42 +41,30 @@ async function searchImages(newQuery) {
             });
         } else {
             renderImages(data.hits);
-            if (countForPage * page >= data.totalHits) {
-                document.querySelector('#load-more-button').style.display = 'none';
-                iziToast.info({
-                    message: "We're sorry, but you've reached the end of search results.",
-                    position: 'topRight',
-                });
-            } else {
-                document.querySelector('#load-more-button').style.display = 'block';
-            }
         }
-        
-        page++;
 
+        if (countForPage * page >= data.totalHits) {
+            document.querySelector('#load-more-button').style.display = 'none';
+            iziToast.info({
+                message: "We're sorry, but you've reached the end of search results.",
+                position: 'topRight',
+            });
+        } else {
+            document.querySelector('#load-more-button').style.display = 'block';
+        }
+
+        const cardHeight = document.querySelector('img').getBoundingClientRect().height;
+        window.scrollBy({
+            top: cardHeight * 2,
+            behavior: 'smooth'
+        });
+
+        page++;
     } catch (error) {
         console.error('Error:', error);
-    } finally {
-        document.querySelector('span.loader').style.display = 'none';
     }
+    document.querySelector('span').style.display = 'none';
 }
-
-document.getElementById('form').addEventListener('submit', function(event) {
-    event.preventDefault(); 
-    var inputValue = event.target.elements.input.value; 
-    document.getElementById('main-ul').innerHTML = '';
-    document.getElementById('load-more-button').style.display = 'none';
-
-    if (inputValue.trim() === '') {
-        iziToast.warning({
-            message: 'Please enter a search query.',
-            position: 'topRight',
-        });
-    } else {
-        searchImages(inputValue);
-    }
-    event.target.reset();
-});
 
 document.addEventListener('DOMContentLoaded', (event) => {
     document.querySelector('#load-more-button').addEventListener('click', () => {

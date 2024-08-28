@@ -94,7 +94,7 @@
 // });
 
 // pixabay-api.js
-import axios from 'axios';  // Імпорт axios
+import axios from 'axios';
 import renderImages from './render-functions.js';
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
@@ -124,12 +124,12 @@ async function searchImages(newQuery) {
 
     const url = `https://pixabay.com/api/?${searchParams}`;
     try {
-        document.querySelector('span').style.display = 'block'; // Показуємо лоадер
+        document.querySelector('span').style.display = 'block'; 
 
-        const response = await axios.get(url);  // Використання axios для запиту на бекенд
+        const response = await axios.get(url); 
         const data = response.data;
 
-        document.querySelector('span').style.display = 'none'; // Ховаємо лоадер
+        document.querySelector('span').style.display = 'none'; 
 
         if (data.hits.length === 0) {
             iziToast.error({

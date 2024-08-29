@@ -5,12 +5,14 @@ import 'izitoast/dist/css/iziToast.min.css';
 export default searchImages;
 let page = 1;
 let query = '';
+let isLoadMoreClicked = false;
 const loading = document.querySelector('.loader');
 loading.classList.add('hidden');
 async function searchImages(newQuery) {
   if (newQuery !== query) {
     query = newQuery;
     page = 1;
+    isLoadMoreClicked = false;
   }
   let countForPage = 15;
   const searchParams = new URLSearchParams({
@@ -39,6 +41,9 @@ async function searchImages(newQuery) {
       return;
     } else {
       renderImages(data.hits);
+      if (isLoadMoreClicked) {
+        smoothScroll();
+      }
     }
     if (countForPage * page >= data.totalHits) {
       document.querySelector('#load-more-button').style.display = 'none';
@@ -51,14 +56,14 @@ async function searchImages(newQuery) {
       loading.classList.add('hidden');
     }
     page++;
-    smoothScroll();
   } catch (error) {
     loading.classList.add('hidden');
     console.error('Error:', error);
   }
 }
-document.addEventListener('DOMContentLoaded', event => {
+document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#load-more-button').addEventListener('click', () => {
+    isLoadMoreClicked = true;
     searchImages(query);
   });
 });
